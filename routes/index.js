@@ -1,11 +1,11 @@
 const router = require('express').Router();
 
 
-const clothingItemsRouter = require('./clothingItems');
+const items = require('./items');
 const userRouter = require('./users');
 
 router.use('/users', userRouter);
-router.use('/clothingItems',clothingItemsRouter);
+router.use('/items',items);
 
 
 router.use((req, res) => {
