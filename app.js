@@ -18,15 +18,9 @@ mongoose
   app.use(express.json());
 
 
-  app.get('/',(req, res) => {
-    console.log("GET request received at /");
-    res.status(200).send({ message: "User created successfully" });
-  });
-
-
 app.use((req, res, next) => {
   req.user = {
-    _id: '5d8b8592978f8bd833ca8133'// paste the _id of the test user created in the previous step
+    _id: '5d8b8592978f8bd833ca8133'
   };
   next();
 });

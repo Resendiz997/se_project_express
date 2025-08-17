@@ -5,7 +5,7 @@ const ClothingItem = require("../models/items");
 const {
   INTERNAL_SERVER_ERROR,
   SUCCESSFUL_REQUEST,
-  NO_CONTENT,
+  CREATED_REQUEST,
   BAD_REQUEST,
   NOT_FOUND,
 } = require("../utils/erros");
@@ -16,7 +16,7 @@ const createClothingItem = (req, res) => {
   const { name, weather, imageUrl } = req.body;
   const owner = req.user._id;
   ClothingItem.create({ name, weather, imageUrl, owner })
-    .then((item) => res.status(SUCCESSFUL_REQUEST).send(item))
+    .then((item) => res.status(CREATED_REQUEST).send(item))
     .catch((err) => {
       console.error(err);
       if (err.name === "ValidationError") {
@@ -41,21 +41,7 @@ const getClothingItems = (req, res) => {
     });
 };
 
-///UPDATE
 
-const updateClothingItemById = (req, res) => {
-  const { clothingItemId } = req.params;
-  const { imageUrl } = req.body;
-  ClothingItem.findByIdAndUpdate(clothingItemId, { $set: { imageUrl } })
-    .orFail()
-    .then((item) => res.status(SUCCESSFUL_REQUEST).send({ data: item }))
-    .catch((err) => {
-      console.error(err);
-      res
-        .status(INTERNAL_SERVER_ERROR)
-        .send({ message: "Error from updateClothingItemById" });
-    });
-};
 
 //DELETE
 
@@ -89,8 +75,9 @@ const deleteClothingItemById = (req, res) => {
 const likeItem = (req, res) => {
   const { clothingItemId } = req.params;
     ClothingItem.findByIdAndUpdate(clothingItemId, {
-    $addToSet: { likes: req.user._id },
-  }).orFail()
+    $addToSet: { likes: req.user._id }},
+    { new: true }
+  ).orFail()
     .then((item) => res.status(SUCCESSFUL_REQUEST).send({ data: item }))
     .catch((err) => {
       console.error(err);
@@ -111,7 +98,7 @@ const likeItem = (req, res) => {
 
 const unlikeItem = (req, res) => {
   const { clothingItemId } = req.params;
-  ClothingItem.findByIdAndUpdate(clothingItemId, { $pull: { likes: req.user._id } })
+  ClothingItem.findByIdAndUpdate(clothingItemId, { $pull: { likes: req.user._id } }, {new: true})
     .orFail()
     .then((item) => res.status(SUCCESSFUL_REQUEST).send({ data: item }))
     .catch((err) => {
@@ -135,7 +122,6 @@ module.exports = {
   createClothingItem,
   getClothingItems,
   deleteClothingItemById,
-  updateClothingItemById,
   likeItem,
   unlikeItem,
 };
