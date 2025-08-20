@@ -4,24 +4,27 @@ const {
   NOT_FOUND,
   INTERNAL_SERVER_ERROR,
   BAD_REQUEST,
-  CREATEED_REQUEST,
+  CREATED_REQUEST,
   SUCCESSFUL_REQUEST,
 } = require("../utils/erros");
 
-// GET /users
+
 const getUsers = (req, res) => {
   User.find({})
     .then((users) => res.send(users))
     .catch((err) => {
-      console.error(err);
-      res.status(INTERNAL_SERVER_ERROR).send({ message: err.message });
+      console.error(err.name);
+      return res
+        .status(INTERNAL_SERVER_ERROR)
+        .send({ message: "An unexpected error occurred" });
+
     });
 };
-//POST createUser
+
 const createUser = (req, res) => {
   const { name, avatar } = req.body;
   User.create({ name, avatar })
-    .then((user) => res.status(CREATEED_REQUEST).send(user))
+    .then((user) => res.status(CREATED_REQUEST).send(user))
     .catch((err) => {
       console.error(err);
       if (err.name === "ValidationError") {
@@ -31,7 +34,6 @@ const createUser = (req, res) => {
     });
 };
 
-//GET userbyId
 
 const getUserById = (req, res) => {
   const { id } = req.params;
