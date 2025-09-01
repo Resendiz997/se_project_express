@@ -2,7 +2,6 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const User = require("../models/user");
 
-
 const { JWT_SECRET } = require("../utils/config");
 
 const {
@@ -12,9 +11,8 @@ const {
   CREATED_REQUEST,
   SUCCESSFUL_REQUEST,
   UNAUTHORIZED,
-  CONFLICT
+  CONFLICT,
 } = require("../utils/errors");
-
 
 const getUsers = (req, res) => {
   User.find({})
@@ -34,7 +32,7 @@ const createUser = (req, res) => {
       .status(BAD_REQUEST)
       .send({ message: "Email and password are required." });
   }
-   return User.findOne({ email })
+  return User.findOne({ email })
     .then((result) => {
       if (result !== null) {
         return res
@@ -55,8 +53,13 @@ const createUser = (req, res) => {
       if (err.name === "ValidationError") {
         return res.status(BAD_REQUEST).send({ message: "Bad request." });
       }
+      if (err.code === 11000) {
+        return res
+          .status(CONFLICT)
+          .send({ message: "User with this email already exists" });
+      }
       return res.status(INTERNAL_SERVER_ERROR).send({ message: err.message });
-});
+    });
 };
 
 const getCurrentUser = (req, res) => {
@@ -114,24 +117,32 @@ const signIn = (req, res) => {
       return res
         .status(INTERNAL_SERVER_ERROR)
         .send({ message: "An unexpected error occurred" });
-});
-  };
-
-
-const updateUserProfile = (req,res)=> {
-  const { name, avatar } = req.body;
-  const {_id} = req.user;
-  User.findByIdAndUpdate(_id, {name, avatar}, {new:true})
-  .orFail(new Error("User not found"))
-  .then((user) => res.status(SUCCESSFUL_REQUEST).send(user))
-  .catch((err) => {
-    console.error(err);
-    if (err.name === "ValidationError") {
-      return res.status(BAD_REQUEST).send({ message: "Bad request." });
-    }
-    return res.status(INTERNAL_SERVER_ERROR).send({ message: err.message });
-  })
+    });
 };
 
+const updateUserProfile = (req, res) => {
+  const { name, avatar } = req.body;
+  const { _id } = req.user;
+  User.findByIdAndUpdate(
+    _id,
+    { name, avatar },
+    { new: true, runValidators: true }
+  )
+    .orFail(new Error("User not found"))
+    .then((user) => res.status(SUCCESSFUL_REQUEST).send(user))
+    .catch((err) => {
+      console.error(err);
+      if (err.name === "ValidationError") {
+        return res.status(BAD_REQUEST).send({ message: "Bad request." });
+      }
+      return res.status(INTERNAL_SERVER_ERROR).send({ message: err.message });
+    });
+};
 
-module.exports = { getUsers, createUser, getCurrentUser, signIn ,updateUserProfile };
+module.exports = {
+  getUsers,
+  createUser,
+  getCurrentUser,
+  signIn,
+  updateUserProfile,
+};

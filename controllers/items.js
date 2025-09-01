@@ -38,7 +38,7 @@ const getClothingItems = (req, res) => {
 
 const deleteClothingItemById = (req, res) => {
   const { clothingItemId } = req.params;
-  ClothingItem.findById(clothingItemId)
+  ClothingItem.findById(clothingItemId).orFail()
     .then((item) => {
       if (item.owner.toString() !== req.user._id.toString()) {
         return res.status(FORBIDDEN).send({ message: "Access id denied" });
