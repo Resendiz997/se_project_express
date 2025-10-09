@@ -6,6 +6,7 @@ const mongoose = require("mongoose");
 const mainRouter = require("./routes/index");
 
 const { createUser, signIn } = require("./controllers/users");
+const errorHandler = require("./middlewares/error-handlers");
 
 const app = express();
 const { PORT = 3001 } = process.env;
@@ -21,9 +22,7 @@ app.use(cors());
 app.use(express.json());
 
 app.use("/", mainRouter);
-
-app.post("/signin", signIn);
-app.post("/signup", createUser);
+app.use(errorHandler);
 
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}`);

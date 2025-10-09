@@ -1,7 +1,6 @@
 const ClothingItem = require("../models/items");
 
 const {
-  INTERNAL_SERVER_ERROR,
   SUCCESSFUL_REQUEST,
   CREATED_REQUEST,
   BAD_REQUEST,
@@ -15,13 +14,13 @@ const createClothingItem = (req, res) => {
   ClothingItem.create({ name, weather, imageUrl, owner })
     .then((item) => res.status(CREATED_REQUEST).send(item))
     .catch((err) => {
-      console.error(err);
-      if (err.name === "ValidationError") {
-        return res.status(BAD_REQUEST).send({ message: err.message });
+      if (err.name === "CastError") {
+        next(new BAD_REQUEST("The id string is in an invalid format"));
       }
-      return res
-        .status(INTERNAL_SERVER_ERROR)
-        .send({ message: "error from createClothingItem" });
+      if (err.name === "ValidationError") {
+        next(new BAD_REQUEST("The id string is in an invalid format"));
+        next(err);
+      }
     });
 };
 
@@ -31,34 +30,36 @@ const getClothingItems = (req, res) => {
       res.status(SUCCESSFUL_REQUEST).send(items);
     })
     .catch((err) => {
-      console.error(err);
-      res.status(INTERNAL_SERVER_ERROR).send({ message: err.message });
+      if (err.name === "CastError") {
+        next(new BAD_REQUEST("The id string is in an invalid format"));
+      }
+      if (err.name === "DocumentNotFoundError") {
+        next(new NOT_FOUND( "Clothing item is not found"));
+        next(err);
+      }
     });
 };
 
 const deleteClothingItemById = (req, res) => {
   const { clothingItemId } = req.params;
-  ClothingItem.findById(clothingItemId).orFail()
+  ClothingItem.findById(clothingItemId)
+    .orFail()
     .then((item) => {
       if (item.owner.toString() !== req.user._id.toString()) {
         return res.status(FORBIDDEN).send({ message: "Access id denied" });
       }
-      return ClothingItem.findByIdAndDelete(clothingItemId)
-        .then(() => res.status(SUCCESSFUL_REQUEST).send({ item }));
+      return ClothingItem.findByIdAndDelete(clothingItemId).then(() =>
+        res.status(SUCCESSFUL_REQUEST).send({ item })
+      );
     })
     .catch((err) => {
-      console.error(err.status);
-      if (err.name === "DocumentNotFoundError") {
-        return res
-          .status(NOT_FOUND)
-          .send({ message: "Clothing item is not found" });
-      }
       if (err.name === "CastError") {
-        return res
-          .status(BAD_REQUEST)
-          .send({ message: "Clothing item is incorrect" });
+        next(new BAD_REQUEST("The id string is in an invalid format"));
       }
-      return res.status(BAD_REQUEST).send({ message: err.message });
+      if (err.name === "ValidationError") {
+        next(new BAD_REQUEST("The id string is in an invalid format"));
+        next(err);
+      }
     });
 };
 
@@ -72,22 +73,15 @@ const likeItem = (req, res) => {
     { new: true }
   )
     .orFail()
-    .then((item) => res.status(SUCCESSFUL_REQUEST).send({ data: item }))
+    .then((item) => res.status(SUCCESSFUL_REQUEST).send(item))
     .catch((err) => {
-      console.error(err);
-      if (err.name === "DocumentNotFoundError") {
-        return res
-          .status(NOT_FOUND)
-          .send({ message: "Invalid clothing item ID" });
-      }
       if (err.name === "CastError") {
-        return res
-          .status(BAD_REQUEST)
-          .send({ message: "Clothing item is not found" });
+        next(new BAD_REQUEST("The id string is in an invalid format"));
       }
-      return res
-        .status(INTERNAL_SERVER_ERROR)
-        .send({ message: "Error from likeItem" });
+      if (err.name === "ValidationError") {
+        next(new BAD_REQUEST("The id string is in an invalid format"));
+        next(err);
+      }
     });
 };
 
@@ -99,22 +93,15 @@ const unlikeItem = (req, res) => {
     { new: true }
   )
     .orFail()
-    .then((item) => res.status(SUCCESSFUL_REQUEST).send({ data: item }))
+    .then((item) => res.status(SUCCESSFUL_REQUEST).send(item))
     .catch((err) => {
-      console.error(err);
-      if (err.name === "DocumentNotFoundError") {
-        return res
-          .status(NOT_FOUND)
-          .send({ message: "Clothing item not found " });
-      }
       if (err.name === "CastError") {
-        return res
-          .status(BAD_REQUEST)
-          .send({ message: "Invalid clothing item ID" });
+        next(new BAD_REQUEST("The id string is in an invalid format"));
       }
-      return res
-        .status(INTERNAL_SERVER_ERROR)
-        .send({ message: "Error from unlikeItem" });
+      if (err.name === "ValidationError") {
+        next(new BAD_REQUEST("The id string is in an invalid format"));
+        next(err);
+      }
     });
 };
 

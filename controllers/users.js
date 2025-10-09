@@ -12,7 +12,7 @@ const {
   SUCCESSFUL_REQUEST,
   UNAUTHORIZED,
   CONFLICT,
-} = require("../utils/errors");
+} = require ("../utils/errors");
 
 const getUsers = (req, res) => {
   User.find({})
@@ -34,7 +34,7 @@ const createUser = (req, res) => {
   }
   return User.findOne({ email })
     .then((result) => {
-      if (result !== null) {
+      if (result) {
         return res
           .status(CONFLICT)
           .send({ message: "User with this email already exists" });
