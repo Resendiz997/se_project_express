@@ -2,7 +2,6 @@
   INTERNAL_SERVER_ERROR,
   BAD_REQUEST,
   NOT_FOUND,
-  FORBIDDEN,
 } = require("../utils/errors");
 
 
