@@ -17,3 +17,14 @@ Switching over to the back-end side of our WTWR project a couplel diffrent tools
 
 ### Testing
 Before committing your code, make sure you edit the file `sprint.txt` in the root folder. The file `sprint.txt` should contain the number of the sprint you're currently working on. For ex. 12
+
+## Frontend Link : 
+
+https://github.com/Resendiz997/se_project_react 
+
+ ## Project Pitch Videos
+
+ Check out these videos, where I describe my project
+ and some challenges I faced while building it:
+
+ [How I was able to create my first full-stack application using MERN] (https://drive.google.com/file/d/1NvyvFa1BcshXzhBuMxYRxVPlNXtb1E_C/view?usp=sharing) 

@@ -14,3 +14,11 @@ node_modules
 .idea
 .vscode
 .env
+
+
+#Video ignore 
+*.mp4
+*.avi
+*.mov
+*.mkv
+videos/

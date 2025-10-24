@@ -3,41 +3,23 @@ const ClothingItem = require("../models/items");
 const {
   SUCCESSFUL_REQUEST,
   CREATED_REQUEST,
-  BAD_REQUEST,
-  NOT_FOUND,
   FORBIDDEN,
 } = require("../utils/errors");
 
-const createClothingItem = (req, res) => {
+const createClothingItem = (req, res,next) => {
   const { name, weather, imageUrl } = req.body;
   const owner = req.user._id;
   ClothingItem.create({ name, weather, imageUrl, owner })
     .then((item) => res.status(CREATED_REQUEST).send(item))
-    .catch((err) => {
-      if (err.name === "CastError") {
-        next(new BAD_REQUEST("The id string is in an invalid format"));
-      }
-      if (err.name === "ValidationError") {
-        next(new BAD_REQUEST("The id string is in an invalid format"));
-        next(err);
-      }
-    });
+    .catch(next)
 };
 
-const getClothingItems = (req, res) => {
+const getClothingItems = (req, res,next) => {
   ClothingItem.find({})
     .then((items) => {
       res.status(SUCCESSFUL_REQUEST).send(items);
     })
-    .catch((err) => {
-      if (err.name === "CastError") {
-        next(new BAD_REQUEST("The id string is in an invalid format"));
-      }
-      if (err.name === "DocumentNotFoundError") {
-        next(new NOT_FOUND( "Clothing item is not found"));
-        next(err);
-      }
-    });
+    .catch(next)
 };
 
 const deleteClothingItemById = (req, res) => {
@@ -46,21 +28,13 @@ const deleteClothingItemById = (req, res) => {
     .orFail()
     .then((item) => {
       if (item.owner.toString() !== req.user._id.toString()) {
-        return res.status(FORBIDDEN).send({ message: "Access id denied" });
+        throw new FORBIDDEN ("Access id denied");
       }
       return ClothingItem.findByIdAndDelete(clothingItemId).then(() =>
         res.status(SUCCESSFUL_REQUEST).send({ item })
       );
     })
-    .catch((err) => {
-      if (err.name === "CastError") {
-        next(new BAD_REQUEST("The id string is in an invalid format"));
-      }
-      if (err.name === "ValidationError") {
-        next(new BAD_REQUEST("The id string is in an invalid format"));
-        next(err);
-      }
-    });
+    .catch(next)
 };
 
 const likeItem = (req, res) => {
@@ -74,15 +48,7 @@ const likeItem = (req, res) => {
   )
     .orFail()
     .then((item) => res.status(SUCCESSFUL_REQUEST).send(item))
-    .catch((err) => {
-      if (err.name === "CastError") {
-        next(new BAD_REQUEST("The id string is in an invalid format"));
-      }
-      if (err.name === "ValidationError") {
-        next(new BAD_REQUEST("The id string is in an invalid format"));
-        next(err);
-      }
-    });
+    .catch(next)
 };
 
 const unlikeItem = (req, res) => {
@@ -94,15 +60,7 @@ const unlikeItem = (req, res) => {
   )
     .orFail()
     .then((item) => res.status(SUCCESSFUL_REQUEST).send(item))
-    .catch((err) => {
-      if (err.name === "CastError") {
-        next(new BAD_REQUEST("The id string is in an invalid format"));
-      }
-      if (err.name === "ValidationError") {
-        next(new BAD_REQUEST("The id string is in an invalid format"));
-        next(err);
-      }
-    });
+    .catch(next);
 };
 
 module.exports = {
