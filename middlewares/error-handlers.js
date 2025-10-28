@@ -39,8 +39,8 @@ const errorHandler = ((err,req,res,next)=>{
 
   const {statusCode = INTERNAL_SERVER_ERROR , message} = err;
 
-  res.status(statusCode).send({
-      message:statusCode === INTERNAL_SERVER_ERROR ? 'An error ocurred on the server' : message
+ return  res.status(statusCode).send({
+    message:statusCode === INTERNAL_SERVER_ERROR ? 'An error ocurred on the server' : message
 
   });
 });

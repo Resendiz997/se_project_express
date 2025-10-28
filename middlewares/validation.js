@@ -20,7 +20,7 @@ module.exports.itemCreation = celebrate({
     imageUrl: Joi.string().required().custom(validateURL).messages({
       "string.empty": 'The "imageUrl" field must be filled in',
       "string.uri": 'the "imageUrl" field must be a valid url',
-    }),
+    }),weather:Joi.string().valid("hot", "warm", "cold").required()
   })
 })
 
@@ -52,7 +52,7 @@ module.exports.userAuthentication = celebrate({
 
 module.exports.objectIds = celebrate({
 params: Joi.object().keys({
-  itemId: Joi.string().length(24).hex().messages({
+  clothingItemId: Joi.string().length(24).hex().messages({
     'string.length': 'The ID must be exactly 24 characters long ',
     'string.hex': 'The ID must be in hexdecimal characters only',
   }),
