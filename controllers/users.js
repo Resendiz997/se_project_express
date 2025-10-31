@@ -1,15 +1,15 @@
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const User = require("../models/user");
+const BadRequest = require('../utils/badRequest');
+const Conflict = require('../utils/conflict');
+const Unauthorized =require('../utils/unauthorized');
 
 const { JWT_SECRET } = require("../utils/config");
 
 const {
-  BAD_REQUEST,
   CREATED_REQUEST,
   SUCCESSFUL_REQUEST,
-  UNAUTHORIZED,
-  CONFLICT,
 } = require ("../utils/errors");
 
 const getUsers = (req, res,next) => {
@@ -21,12 +21,12 @@ const getUsers = (req, res,next) => {
 const createUser = (req, res, next) => {
   const { name, avatar, email, password } = req.body;
   if (!email || !password) {
-    throw new BAD_REQUEST("Email and password are required." );
+    next(new BadRequest("Email and password are required."));
   }
   return User.findOne({ email })
     .then((result) => {
       if (result) {
-        throw new CONFLICT("User with this email already exists" );
+        next(new Conflict("User with this email already exists"));
       }
       return bcrypt
         .hash(password, 10)
@@ -51,18 +51,18 @@ const getCurrentUser = (req, res, next) => {
 const signIn = (req, res, next) => {
   const { email, password } = req.body;
   if (!email || !password) {
-    throw new BAD_REQUEST("Email and password are required." );
+    next(new BadRequest("Email and password are required."));
   }
    return User.findOne({ email })
     .select("+password")
     .then((user) => {
       if (!user) {
-        throw new UNAUTHORIZED("Incorrect email or password" );
+        next(new Unauthorized("Incorrect email or password"));
       }
       return bcrypt.compare(password, user.password)
       .then((match) => {
         if (!match) {
-          throw new UNAUTHORIZED("Incorrect email or password");
+          next(new Unauthorized("Incorrect email or password"))
         }
         const token = jwt.sign({ _id: user._id }, JWT_SECRET, {
           expiresIn: "7d",

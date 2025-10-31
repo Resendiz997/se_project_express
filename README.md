@@ -28,3 +28,7 @@ https://github.com/Resendiz997/se_project_react
  and some challenges I faced while building it:
 
  [How I was able to create my first full-stack application using MERN] (https://drive.google.com/file/d/1NvyvFa1BcshXzhBuMxYRxVPlNXtb1E_C/view?usp=sharing) 
+
+ ## Domain name 
+ . Front-end : http://wtwr2day.crabdance.com 
+ . Back-end :  http://api.wtwr2day.crabdance.com 

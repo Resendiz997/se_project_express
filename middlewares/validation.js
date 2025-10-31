@@ -1,14 +1,12 @@
-const { Joi, celebrate } = require('celebrate');
-const validator = require('validator');
-
+const { Joi, celebrate } = require("celebrate");
+const validator = require("validator");
 
 const validateURL = (value, helpers) => {
   if (validator.isURL(value)) {
     return value;
   }
-  return helpers.error('string.uri');
-}
-
+  return helpers.error("string.uri");
+};
 
 module.exports.itemCreation = celebrate({
   body: Joi.object().keys({
@@ -20,43 +18,49 @@ module.exports.itemCreation = celebrate({
     imageUrl: Joi.string().required().custom(validateURL).messages({
       "string.empty": 'The "imageUrl" field must be filled in',
       "string.uri": 'the "imageUrl" field must be a valid url',
-    }),weather:Joi.string().valid("hot", "warm", "cold").required()
-  })
-})
+    }),
+    weather: Joi.string().valid("hot", "warm", "cold").required(),
+  }),
+});
 
-module.exports.userCreation= celebrate({
+module.exports.userCreation = celebrate({
   body: Joi.object().keys({
     avatar: Joi.string().required().custom(validateURL),
     password: Joi.string().required().min(8).messages({
-      'string.empty': 'The "password" field must be filled in',
+      "string.empty": 'The "password" field must be filled in',
     }),
     name: Joi.string().required().min(2).max(30),
     email: Joi.string().required().email().messages({
-      'string.empty': 'The "email" field must be filled in',
-      'string.email': 'The "email" field must be a valid email',
+      "string.empty": 'The "email" field must be filled in',
+      "string.email": 'The "email" field must be a valid email',
+    }),
   }),
-})
-})
+});
 
 module.exports.userAuthentication = celebrate({
   body: Joi.object().keys({
     email: Joi.string().required().email().messages({
-      'string.empty': 'The "email" field must be filled in',
-      'string.email': 'The "email" field must be a valid email',
+      "string.empty": 'The "email" field must be filled in',
+      "string.email": 'The "email" field must be a valid email',
     }),
     password: Joi.string().required().messages({
-      'string.empty': 'The "password" field must be filled in',
+      "string.empty": 'The "password" field must be filled in',
     }),
   }),
-})
+});
+
+module.exports.validateUserUpdate = celebrate({
+  body: Joi.object().keys({
+    name: Joi.string().min(2).max(30).required(),
+    avatar: Joi.string().uri().required(),
+  }),
+});
 
 module.exports.objectIds = celebrate({
-params: Joi.object().keys({
-  clothingItemId: Joi.string().length(24).hex().messages({
-    'string.length': 'The ID must be exactly 24 characters long ',
-    'string.hex': 'The ID must be in hexdecimal characters only',
+  params: Joi.object().keys({
+    clothingItemId: Joi.string().length(24).hex().messages({
+      "string.length": "The ID must be exactly 24 characters long ",
+      "string.hex": "The ID must be in hexdecimal characters only",
+    }),
   }),
-}),
-})
-
-
+});
